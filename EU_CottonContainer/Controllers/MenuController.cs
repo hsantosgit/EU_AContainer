@@ -1,4 +1,5 @@
 ﻿using EU_CottonContainer.Bussines.Facade;
+using EU_CottonContainer.Helpers;
 using EU_CottonContainer.Model;
 using EU_CottonSecurity;
 using Microsoft.AspNetCore.Authorization;
@@ -61,6 +62,7 @@ namespace EU_CottonContainer.Controllers
                     menu.idAplicacion = 0;
                     if (MenuFacade.AddMenu(menu) > 0)
                     {
+                        BitacoraFacade.AddBitacora(new Bitacora { idUsuario = _user.idUsuario, idMenu = 5, Accion = "Se agregó menú : " + menu.Nombre, ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
                         resp = "OK";
                     }
                     else
@@ -131,6 +133,7 @@ namespace EU_CottonContainer.Controllers
                     menu.idAplicacion = 0;
                     if (MenuFacade.EditMenu(menu) > 0)
                     {
+                        BitacoraFacade.AddBitacora(new Bitacora { idUsuario = _user.idUsuario, idMenu = 5, Accion = "Se editó menú : " + menu.Nombre, ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
                         resp = "OK";
                     }
                     else
@@ -182,6 +185,7 @@ namespace EU_CottonContainer.Controllers
                     menu.idAplicacion = 0;
                     if (MenuFacade.AddSubMenu(menu) > 0)
                     {
+                        BitacoraFacade.AddBitacora(new Bitacora { idUsuario = _user.idUsuario, idMenu = 5, Accion = "Se agregó submenú : " + menu.Nombre, ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
                         resp = "OK";
                     }
                     else
@@ -214,6 +218,7 @@ namespace EU_CottonContainer.Controllers
                     menu.idAplicacion = 0;
                     if (MenuFacade.EditSubMenu(menu) > 0)
                     {
+                        BitacoraFacade.AddBitacora(new Bitacora { idUsuario = _user.idUsuario, idMenu = 5, Accion = "Se edito submenú : " + menu.Nombre, ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
                         resp = "OK";
                     }
                     else

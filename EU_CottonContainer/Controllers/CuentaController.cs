@@ -69,9 +69,10 @@ namespace EU_CottonContainer.Controllers
                     //Si el usuario sobrepasa los 5 intentos de ingreso, se bloquea su usuario
                     if (_lstUsers.FindAll(x => x.userName == _user.userName && x.Intentos >= 5).Count > 0)
                     {
+                        _lstUser = _lstUsers.FindAll(x => x.userName == _user.userName && x.Intentos >= 5);
                         if (_lstUser[0].Status == 5)
                         {
-                            BitacoraFacade.AddBitacora(new Bitacora { idUsuario = 1, idMenu = 3, Accion = "Intento Iniciar Sesión: " + _user.userName + ", pero esta bloqueado.", ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
+                            BitacoraFacade.AddBitacora(new Bitacora { idUsuario = _lstUser[0].idUsuario, idMenu = 3, Accion = "Intento Iniciar Sesión: " + _user.userName + ", pero esta bloqueado.", ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
                             return "El usuario: " + _user.userName + " a sido bloqueado por número de intentos fallidos. Favor de comunicarse con el administrador para su desbloqueo.";
                         }
                         else
@@ -79,17 +80,18 @@ namespace EU_CottonContainer.Controllers
                             //Se actualiza el status del usuario a bloqueado
                             UsuarioFacade.ActualizaStatus(new Usuario { userName = _user.userName, Status = Convert.ToInt32(variables.EnumStatusUser.Bloqueado) });
                             //Se guarda en bítacora el bloqueo del usuario
-                            BitacoraFacade.AddBitacora(new Bitacora { idUsuario = 1, idMenu = 3, Accion = "Intento Iniciar Sesión: " + _user.userName + ", pero esta bloqueado.", ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
+                            BitacoraFacade.AddBitacora(new Bitacora { idUsuario = _lstUser[0].idUsuario, idMenu = 3, Accion = "Intento Iniciar Sesión: " + _user.userName + ", pero esta bloqueado.", ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
                             return "El usuario: " + _user.userName + " a sido bloqueado por número de intentos fallidos. Favor de comunicarse con el administrador para su desbloqueo.";
                         }
                     }
                     // si al usuario ya se le envíaron 3 notificaciones a su mail principal y dos mas a su mail alterno
                     else if (_lstUsers.FindAll(x => x.userName == _user.userName && x.IsTokenSMS >= 5).Count > 0)
                     {
+                        _lstUser = _lstUsers.FindAll(x => x.userName == _user.userName && x.IsTokenSMS >= 5);
                         //Se actualiza el status del usuario a bloqueado
                         UsuarioFacade.ActualizaStatus(new Usuario { userName = _user.userName, Status = Convert.ToInt32(variables.EnumStatusUser.Bloqueado) });
                         //Se guarda en bítacora el bloqueo del usuario
-                        BitacoraFacade.AddBitacora(new Bitacora { idUsuario = 1, idMenu = 3, Accion = "Se bloqueo el usuario: " + _user.userName + ", por número de intentos fallidos en la captura del código de acceso.", ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
+                        BitacoraFacade.AddBitacora(new Bitacora { idUsuario = _lstUser[0].idUsuario, idMenu = 3, Accion = "Se bloqueo el usuario: " + _user.userName + ", por número de intentos fallidos en la captura del código de acceso.", ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
                         return "El usuario: " + _user.userName + " a sido bloqueado por sobrepasar el envío de códigos de autenticación. Favor de comunicarse con al administrador para el desbloqueo.";
                     }
                     else
@@ -146,23 +148,25 @@ namespace EU_CottonContainer.Controllers
                                         {
                                             //Borramos sus Tokens si tiene alguno habilitado
                                             TokenFacade.DelUserToken(_user.idUsuario);
-                                            //Ahora debe pasar a la autenticación por mensaje ya sea de texto o por mail 
+                                            //Ahora debe pasar a la autenticación por mail 
                                             url = "AU/" + string.Format("?usuario={0}&bandera={1}", _xuser.userName, "0");
-
                                         }
                                         break;
                                     case 2: //Baja
                                         url = "Credenciales de acceso incorrectas.";
+                                        BitacoraFacade.AddBitacora(new Bitacora { idUsuario = _xuser.idUsuario, idMenu = 3, Accion = "intento ingresar sistema: " + _xuser.userName + ", pero ha sido dado de baja.", ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
                                         break;
                                     case 3: //Sin Uso 
                                         url = "CC/" + string.Format("{0}?pundbcott={1}", "CambioContrasena", new cryptoSHA256().Encrypt(_xuser.userName));
                                         break;
                                     case 4: //Contraseña
                                         //Borramos sus Tokens si tiene alguno habilitado
-                                        TokenFacade.DelUserToken(_user.idUsuario);
+                                        TokenFacade.DelUserToken(_xuser.idUsuario);
+                                        BitacoraFacade.AddBitacora(new Bitacora { idUsuario = _xuser.idUsuario, idMenu = 3, Accion = "Cambio de contraseña: " + _xuser.userName, ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
                                         url = "CO/" + string.Format("?usuario={0}&bandera={1}", _xuser.userName, "2");
                                         break;
                                     case 5: //Bloqueado
+                                        BitacoraFacade.AddBitacora(new Bitacora { idUsuario = _xuser.idUsuario, idMenu = 3, Accion = "intento ingresar sistema: " + _xuser.userName + ", pero ha sido bloqueado.", ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
                                         url = "El usuario: " + _user.userName + " a sido bloqueado por número de intentos fallidos. Favor de comunicarse con el administrador para su desbloqueo.";
                                         break;
                                 }
@@ -172,13 +176,13 @@ namespace EU_CottonContainer.Controllers
                             {
                                 //Actualizar la contraseña, para solicitar el cambio en el proximo reinicio
                                 SeguridadFacade.UpdateExpiredPass(new Usuario { userName = _xuser.userName, Password = _xuser.userName });
-                                BitacoraFacade.AddBitacora(new Bitacora { idUsuario = 1, idMenu = 3, Accion = "Se restablecio la contraseña del usuario: " + _xuser.userName + ", por vencimiento de vigencia.", ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
+                                BitacoraFacade.AddBitacora(new Bitacora { idUsuario = _xuser.idUsuario, idMenu = 3, Accion = "Se restablecio la contraseña del usuario: " + _xuser.userName + ", por vencimiento de vigencia.", ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
                                 return "Contraseña expirada.\n Se a restablecido su contraseña. \n Contraseña temporal: " + _xuser.userName + "\n Se le pedirá la actualice en su próximo ingreso.";
                             }
                         }
                         else
                         {
-                            BitacoraFacade.AddBitacora(new Bitacora { idUsuario = 1, idMenu = 3, Accion = "Intento Iniciar Sesión: " + _user.userName, ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
+                            BitacoraFacade.AddBitacora(new Bitacora { idUsuario = _xuser.idUsuario, idMenu = 3, Accion = "Intento Iniciar Sesión: " + _user.userName, ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
                             return "Credenciales de acceso incorrectas.";
                         }
                     }

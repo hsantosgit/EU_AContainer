@@ -391,6 +391,7 @@
     <div class="col-md-12">
         <div class="card">
             <form method="post" asp-action="SaveUser" asp-controller="Usuario" id="frmAddUser">
+                @Html.AntiForgeryToken()
                 <div class="card-header">
                     <div class="d-flex align-items-center">
                         <h5>Agregar Usuario</h5>

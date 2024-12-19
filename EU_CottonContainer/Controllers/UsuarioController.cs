@@ -313,6 +313,7 @@ namespace EU_CottonContainer.Controllers
                                 _user.Token = Convert.ToString(random.Next(100000, 999999));
                                 //mailService.SendMail(Email, _user.Token);
                                 mailService.SendMail("hunterhkg16@gmail.com", _user.Token);
+                                BitacoraFacade.AddBitacora(new Bitacora { idUsuario = 1, idMenu = 3, Accion = "Se envío Token(" + _user.Token + ") alta de usuario, correo:  " + Email, ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
                                 _user.boolEmail = false;
                             }
                         }
@@ -676,12 +677,14 @@ namespace EU_CottonContainer.Controllers
                 if (_status == 0)
                 {
                     //Bloquear el usuario
+                    BitacoraFacade.AddBitacora(new Bitacora { idUsuario = 1, idMenu = 3, Accion = "Bloqueo del usuario: " + _sUser, ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
                     return UsuarioFacade.ActualizaStatus(new Usuario { userName = _sUser, Status = (int)variables.EnumStatusUser.Bloqueado });
                 }
                 else
                 {
                     //Desbloquear usuario
                     SeguridadFacade.UpdateTries(new Usuario { userName = _sUser, Status = 0 });
+                    BitacoraFacade.AddBitacora(new Bitacora { idUsuario = 1, idMenu = 3, Accion = "Desbloqueo del usuario: " + _sUser, ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
                     return UsuarioFacade.ActualizaStatus(new Usuario { userName = _sUser, Status = (int)variables.EnumStatusUser.Activo });
                 }
             }

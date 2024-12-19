@@ -91,6 +91,7 @@
                         <img src="~/seo/images/eurologo.jpeg" alt="" />
                     </a>
                     <form method="post" asp-action="ActualizarContrasenaUsuario" asp-controller="Seguridad" id="frmAutentica">
+                        @Html.AntiForgeryToken()
                         <div class="mb-3" style="text-align: justify;">
                             @if (Model.IsTokenSMS >= 3)
                             {

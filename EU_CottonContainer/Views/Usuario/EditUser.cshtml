@@ -306,6 +306,7 @@
     <div class="col-md-12">
         <div class="card">
             <form method="post" asp-action="SaveEditUser" asp-controller="Usuario" id="frmEditUser">
+                @Html.AntiForgeryToken()
                 <div class="card-header">
                     <div class="d-flex align-items-center">
                         <h5>Editar Usuario</h5>

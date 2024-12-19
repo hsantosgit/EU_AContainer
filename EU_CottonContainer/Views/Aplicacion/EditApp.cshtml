@@ -106,6 +106,7 @@
     <div class="col-md-12">
         <div class="card">
             <form method="post" asp-action="SaveEditApp" asp-controller="Aplicacion" id="frmEditApp">
+                @Html.AntiForgeryToken()
                 <div class="card-header">
                     <div class="d-flex align-items-center">
                         <h5>Agregar Menú</h5>

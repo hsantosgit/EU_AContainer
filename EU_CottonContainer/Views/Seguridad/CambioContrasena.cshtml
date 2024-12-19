@@ -103,14 +103,32 @@
                 }
             }
 
-            $("#suggestedpass").text(passramd);
-
+            // $("#suggestedpass").text(passramd);
+            $("#inputPass").val(passramd);
+            var pass = $("#inputPass").val();
+            var _uxclass;
             var regExp = [mayus, special, numbers, lower, len,];
             var elementos = [$("#mayus"), $("#special"), $("#numbers"), $("#lower"), $("#len"), ];
+
+            if(pass == passramd)
+            {
+                _uxclass = $('#progressdiv').attr('class');
+                $("#lblpass").text("Contraseña sugerida:");
+                for (var i = 0; i < 5; i++)
+                {
+                    elementos[i].hide();
+                }
+                $('#progressdiv').removeClass(_uxclass).addClass('progress-bar bg-success w-100');;
+                $("#mensaje").text("Robusta!").css("color", "green");
+                $("#hvalidator").val("1");
+
+                mostrarPassword('inputPass');
+            }
+
             $("#inputPass").on("keyup", function ()
             {
-                var _uxclass = $('#progressdiv').attr('class');
-                var pass = $("#inputPass").val();
+                _uxclass = $('#progressdiv').attr('class');
+                pass = $("#inputPass").val();
                 $("#hvalidator").val("0");
                 $("#mensaje").text("");
                 var check = 0;
@@ -127,7 +145,7 @@
                         elementos[i].show();
                     }
                 }
-
+                $("#lblpass").text("");
                 if (check == 0) {
                     $('#progressdiv').removeClass(_uxclass).addClass('progress-bar w-0');
                     $("#mensaje").text("");
@@ -161,9 +179,10 @@
                     $("#mensaje").text("Insegura").css("color", "red");
                 }
 
-                _uxclass = $('#progressdiv').attr('class');
                 if(pass == passramd)
                 {
+                    _uxclass = $('#progressdiv').attr('class');
+                    $("#lblpass").text("Contraseña sugerida:");
                     for (var i = 0; i < 5; i++)
                     {
                         elementos[i].hide();
@@ -172,7 +191,6 @@
                     $("#mensaje").text("Robusta!").css("color", "green");
                     $("#hvalidator").val("1");
                 }
-
             });
 
             $('#frmCambioContrasena').submit(function () {
@@ -291,6 +309,7 @@
                                     <img src="~/seo/images/eurologo.jpeg" alt="" />
                                 </a>
                                 <form id="frmCambioContrasena" method="post" asp-action="UpdatePass" asp-controller="Seguridad">
+                                    @Html.AntiForgeryToken()
                                     <div class="mb-3" style="text-align: justify;">
                                         <h6>Políticas</h6>
                                         <ul>
@@ -303,7 +322,8 @@
                                         </ul>
                                     </div>
                                     <div class="mb-3">
-                                        <label>Sugerencia: </label><span id="suggestedpass" class="badge"></span>
+                                        <label id="lblpass"></label>
+                                        @* <span id="suggestedpass" class="badge"></span> *@
                                     </div>
                                     <div class="mb-3">
                                         <div class="progress progress-sm">

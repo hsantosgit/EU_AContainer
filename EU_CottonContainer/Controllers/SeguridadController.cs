@@ -19,7 +19,6 @@ namespace EU_CottonContainer.Controllers
         private static Usuario _user;
 
         [HttpPost]
-        [AllowAnonymous]
         [OutputCache]
         public ActionResult Index(string usuario, string bandera)
         {
@@ -49,6 +48,7 @@ namespace EU_CottonContainer.Controllers
                 {
                     mailService.SendMail(_user.CorreoAlterno, _user.Token);
                     SeguridadFacade.UpdateTokenSMS(_user.idUsuario, 1);
+                    BitacoraFacade.AddBitacora(new Bitacora { idUsuario = _user.idUsuario, idMenu = 3, Accion = "Se envío Token(" + _user.Token + "), usuario : " + _user.userName + ", correo alterno:  " + _user.CorreoAlterno, ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
                 }
                 else if (_user.IsTokenMail == 1)
                 {
@@ -56,6 +56,7 @@ namespace EU_CottonContainer.Controllers
                     //this.SendMail();
                     mailService.SendMail(_user.Correo, _user.Token);
                     SeguridadFacade.UpdateTokenSMS(_user.idUsuario, 1);
+                    BitacoraFacade.AddBitacora(new Bitacora { idUsuario = _user.idUsuario, idMenu = 3, Accion = "Se envío Token(" + _user.Token + "), usuario : " + _user.userName + ", correo:  " + _user.Correo, ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
                 }
             }
             else if (bandera == "1")
@@ -65,11 +66,15 @@ namespace EU_CottonContainer.Controllers
                 {
                     mailService.SendMail(_user.CorreoAlterno, _user.Token);
                     SeguridadFacade.UpdateTokenSMS(_user.idUsuario, 1);
+                    BitacoraFacade.AddBitacora(new Bitacora { idUsuario = _user.idUsuario, idMenu = 3, Accion = "Se envío Token(" + _user.Token + "), usuario : " + _user.userName + ", correo alterno:  " + _user.CorreoAlterno, ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
+
                 }
                 else if (_user.IsTokenMail == 1)
                 {
                     //Ejecutar el proceso de envío de código por Email
                     mailService.SendMail(_user.Correo, _user.Token);
+                    SeguridadFacade.UpdateTokenSMS(_user.idUsuario, 1);
+                    BitacoraFacade.AddBitacora(new Bitacora { idUsuario = _user.idUsuario, idMenu = 3, Accion = "Se envío Token(" + _user.Token + "), usuario : " + _user.userName + ", correo:  " + _user.Correo, ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
                 }
             }
             else if (bandera == "2")
@@ -79,6 +84,7 @@ namespace EU_CottonContainer.Controllers
                 {
                     mailService.SendMail(_user.CorreoAlterno, _user.Token);
                     SeguridadFacade.UpdateTokenSMS(_user.idUsuario, 1);
+                    BitacoraFacade.AddBitacora(new Bitacora { idUsuario = _user.idUsuario, idMenu = 3, Accion = "Se envío Token(" + _user.Token + "), usuario : " + _user.userName + ", correo alterno:  " + _user.CorreoAlterno, ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
                 }
                 else if (_user.IsTokenMail == 1)
                 {
@@ -86,6 +92,7 @@ namespace EU_CottonContainer.Controllers
                     //this.SendMail();
                     mailService.SendMail(_user.Correo, _user.Token);
                     SeguridadFacade.UpdateTokenSMS(_user.idUsuario, 1);
+                    BitacoraFacade.AddBitacora(new Bitacora { idUsuario = _user.idUsuario, idMenu = 3, Accion = "Se envío Token(" + _user.Token + "), usuario : " + _user.userName + ", correo:  " + _user.Correo, ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
                 }
             }
             return View(_user);
@@ -101,7 +108,6 @@ namespace EU_CottonContainer.Controllers
         }
 
         [HttpPost]
-        [AllowAnonymous]
         public string Validate(Usuario user)
         {
             string resp = string.Empty;
@@ -136,18 +142,19 @@ namespace EU_CottonContainer.Controllers
                     else if (_user.Sesion == "1")
                     {
                         SeguridadFacade.UpdateExpiredPass(new Usuario { userName = _user.userName, Password = _user.userName });
-                        BitacoraFacade.AddBitacora(new Bitacora { idUsuario = 1, idMenu = 3, Accion = "Usuario solicitó recuperación de contraseña: " + _user.userName, ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
+                        BitacoraFacade.AddBitacora(new Bitacora { idUsuario = _user.idUsuario, idMenu = 3, Accion = "Usuario solicitó recuperación de contraseña: " + user.userName, ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
                         resp = "CA/" + _user.userName;
                     }
                     else if (_user.Sesion == "2")
                     {
+                        BitacoraFacade.AddBitacora(new Bitacora { idUsuario = _user.idUsuario, idMenu = 3, Accion = "Usuario solicitó cambio de contraseña: " + user.userName, ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
                         resp = "CC/" + _user.userName;
                     }
                 }
                 else
                 {
                     resp = "Código de validación incorrecto.";
-                    BitacoraFacade.AddBitacora(new Bitacora { idUsuario = user.idUsuario, idMenu = 3, Accion = "Código de validación incorrecto: " + _user.userName, ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
+                    BitacoraFacade.AddBitacora(new Bitacora { idUsuario = _user.idUsuario, idMenu = 3, Accion = "Código de validación incorrecto: " + _user.userName, ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
                 }
             }
             catch (Exception ex)
@@ -173,7 +180,6 @@ namespace EU_CottonContainer.Controllers
             try
             {
                 Regex regex = new Regex("^(?=.{8,25}$)(?=(?:.*[0-9]){1})(?=(?:.*[.?,;_¡!¿*% &$(){}]){1})(?=.*[A-Z])(?=.*[a-z])(?!.*(.)\\1).+$", RegexOptions.IgnoreCase);
-                //Regex regex = new Regex(@"^(?=.{8,25}$)(?=(?:.*[0-9]){1})(?=(?:.*[.?,;_¡!¿*%&$/(){}]){1})(?=.*[A-Z])(?=.*[a-z])(?!.*(.)\1).+$", RegexOptions.IgnoreCase);
                 if (regex.IsMatch(user.Password) || user.IsToken == 1)
                 {
                     if (user.Password == user.ConfirmPassword)
@@ -182,7 +188,7 @@ namespace EU_CottonContainer.Controllers
                         if (UsuarioFacade.UpdateUser(user) > 0)
                         {
                             SeguridadFacade.UpdateTokenSMS(_user.idUsuario, 0);
-                            BitacoraFacade.AddBitacora(new Bitacora { idUsuario = user.idUsuario, idMenu = 3, Accion = "Actualización contraseña: " + _user.userName, ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
+                            BitacoraFacade.AddBitacora(new Bitacora { idUsuario = user.idUsuario, idMenu = 3, Accion = "Actualización contraseña: " + user.userName, ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
                             resp = "OK";
                         }
                         else
@@ -214,7 +220,6 @@ namespace EU_CottonContainer.Controllers
         }
 
         [HttpPost]
-        [AllowAnonymous]
         public string RestaurarContrasena(Usuario user)
         {
             string resp = string.Empty;
@@ -229,6 +234,7 @@ namespace EU_CottonContainer.Controllers
                     }
                     else
                     {
+                        BitacoraFacade.AddBitacora(new Bitacora { idUsuario = user.idUsuario, idMenu = 3, Accion = "Recuperación de contraseña usuario: " + user.userName, ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
                         resp = "OK/" + string.Format("?usuario={0}&bandera={1}", user.userName, "1");
                     }
                 }
@@ -263,19 +269,20 @@ namespace EU_CottonContainer.Controllers
             {
                 mailService.SendMail(_user.CorreoAlterno, _user.Token);
                 SeguridadFacade.UpdateTokenSMS(_user.idUsuario, 1);
+                BitacoraFacade.AddBitacora(new Bitacora { idUsuario = _user.idUsuario, idMenu = 3, Accion = "Se envío Token(" + _user.Token + "), usuario : " + _user.userName + ", correo alterno:  " + _user.CorreoAlterno, ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
             }
             else if (_user.IsTokenMail == 1)
             {
                 //Ejecutar el proceso de envío de código por Email
                 mailService.SendMail(_user.Correo, _user.Token);
                 SeguridadFacade.UpdateTokenSMS(_user.idUsuario, 1);
+                BitacoraFacade.AddBitacora(new Bitacora { idUsuario = _user.idUsuario, idMenu = 3, Accion = "Se envío Token(" + _user.Token + "), usuario : " + _user.userName + ", correo:  " + _user.Correo, ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
             }
 
             return View(_user);
         }
 
         [HttpPost]
-        [AllowAnonymous]
         public string ActualizarContrasenaUsuario(Usuario user)
         {
             string resp = string.Empty;
@@ -284,13 +291,13 @@ namespace EU_CottonContainer.Controllers
                 if (user.TokenValidate == _user.Token)
                 {
                     SeguridadFacade.UpdateExpiredPass(new Usuario { userName = _user.userName, Password = _user.userName });
-                    BitacoraFacade.AddBitacora(new Bitacora { idUsuario = user.idUsuario, idMenu = 3, Accion = "Usuario solicitó cambio de contraseña: " + _user.userName, ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
-                    resp = "CA/" + _user.userName;
+                    BitacoraFacade.AddBitacora(new Bitacora { idUsuario = user.idUsuario, idMenu = 3, Accion = "Usuario solicitó cambio de contraseña: " + user.userName, ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
+                    resp = "CA/" + user.userName;
                 }
                 else
                 {
                     resp = "Código de validación incorrecto. Favor de validar";
-                    BitacoraFacade.AddBitacora(new Bitacora { idUsuario = user.idUsuario, idMenu = 3, Accion = "Código de validación incorrecto: " + _user.userName, ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
+                    BitacoraFacade.AddBitacora(new Bitacora { idUsuario = user.idUsuario, idMenu = 3, Accion = "Código de validación incorrecto: " + user.userName, ipAddress = this.HttpContext.Connection.RemoteIpAddress.ToString(), mcAddress = location.GetMACAddress(), Ubicacion = location.GetGeoCodedResults(this.HttpContext.Connection.RemoteIpAddress.ToString()).Status.ToString() });
                 }
             }
             catch (Exception ex)

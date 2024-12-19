@@ -104,6 +104,7 @@
         </div>
     </div>
     <form method="post" asp-action="SaveMenuPerfil" asp-controller="Perfil" id="frmSaveMenuPerfil">
+        @Html.AntiForgeryToken()
         <div class="card-body">
             <div id="jstree">
             </div>
